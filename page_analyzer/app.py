@@ -1,17 +1,15 @@
+import requests
+import os
 from flask import Flask, render_template, request, url_for, redirect
-import psycopg2
 from urllib.parse import urlparse
 from validators import url
-import os
-from datetime import datetime, date, time
+from datetime import datetime
 from page_analyzer.database_operations import PostgresqlOperations
-from itertools import chain
 from bs4 import BeautifulSoup
-import requests
 
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'SJLDFJSLJDLJAJSLKDJFLSJF'
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
 db = PostgresqlOperations(user='andrey', password='password', database='database')
 
@@ -23,11 +21,11 @@ def get_site_info(sites_url):
 
     h1 = soup.find('h1').get_text() if soup.find('h1') else ''
     title = soup.find('title').get_text() if soup.find('title') else ''
-    description = soup.find(attrs=({'name': 'description'})).get('content') if soup.find(attrs=({'name': 'description'})) else ''
+    description = soup.find(attrs=({'name': 'description'})).get('content') \
+        if soup.find(attrs=({'name': 'description'})) else ''
     status_code = page.status_code if page.status_code else ''
     result = {'h1': h1, 'title': title, 'description': description, 'status_code': status_code}
     return result
-
 
 
 @app.route('/')
@@ -59,15 +57,17 @@ def get_sites_list():
 def show_site_info(site_id):
     url_info = db.select('sites_list', fields_name='*', condition=f"id = {site_id}")
 
-    checks_list = db.select(table_name='checks_info', fields_name='*', condition=f"sites_list_id = {site_id}", fields_order='id', order='DESC')
+    checks_list = db.select(table_name='checks_info',
+                            fields_name='*',
+                            condition=f"sites_list_id = {site_id}",
+                            fields_order='id', order='DESC')
 
     return render_template('url_info.html', url_info=url_info, checks_list=checks_list)
 
 
-
 @app.route('/urls/<site_id>/checks', methods=['POST'])
 def check_url(site_id):
-    url_site = db.select('sites_list',  fields_name='*', condition=f"id = {site_id}")['name']
+    url_site = db.select('sites_list', fields_name='*', condition=f"id = {site_id}")['name']
 
     checks_result = get_site_info(url_site)
 
@@ -80,6 +80,8 @@ def check_url(site_id):
               description=checks_result['description'],
               created_at=dates_create)
 
-    db.update(table='sites_list', field_name=f"date_last_check = '{dates_create}', last_code_response = '{checks_result['status_code']}'", condition=f"name = '{url_site}'")
+    db.update(table='sites_list',
+              field_name=f"date_last_check = '{dates_create}', last_code_response = '{checks_result['status_code']}'",
+              condition=f"name = '{url_site}'")
 
     return redirect(url_for('show_site_info', site_id=site_id))

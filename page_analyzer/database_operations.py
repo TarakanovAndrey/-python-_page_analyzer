@@ -1,6 +1,5 @@
 import psycopg2
-import sys
-from itertools import chain
+
 
 # class PostgresqlDBManagementSystem(object):
 #     """Питоновский класс для баловства с postgresql"""
@@ -63,7 +62,8 @@ def datas_to_dict(keys, values):
         result.append(dict_)
     return result
 
-class PostgresqlOperations():
+
+class PostgresqlOperations:
 
     __instance = None
     __host = None
@@ -85,12 +85,10 @@ class PostgresqlOperations():
 
     def __open(self):
         try:
-
             self.__connection = psycopg2.connect(database=self.__database,
                                                  user=self.__user,
                                                  password=self.__password)
             self.__cursor = self.__connection.cursor()
-
 
         except psycopg2.DatabaseError:
             print("Can't establish connection to database")
@@ -98,7 +96,6 @@ class PostgresqlOperations():
 
     def __close(self):
         self.__connection.close()
-
 
     def create_table(self, table_name, datas_structure):
         query = f"CREATE TABLE IF NOT EXISTS {table_name} ({', '.join(datas_structure)});"
@@ -115,7 +112,6 @@ class PostgresqlOperations():
         self.__cursor.execute(query)
         self.__connection.commit()
         self.__close()
-
 
     def delete(self, table,
                where: str = False):
@@ -134,8 +130,6 @@ class PostgresqlOperations():
 
         self.__connection.commit()
         self.__close()
-
-
 
     def insert(self, *args, **kwargs):
         table_name = args[0]
@@ -162,7 +156,6 @@ class PostgresqlOperations():
         self.__connection.commit()
         self.__close()
 
-
     def get_heads_table(self, table_name):
         """Вывод названия всех полей таблицы"""
         table_name = table_name
@@ -178,7 +171,6 @@ class PostgresqlOperations():
         self.__close()
         return rows
 
-
     def select(self, table_name: str,
                fields_name: str = None,
                condition: str = None,
@@ -186,18 +178,19 @@ class PostgresqlOperations():
                order: str = None,
                fetch: str = 'all'):
 
-        '''
-         Реализован запрос вида: SELECT <fields_name> FROM <table_name> WHERE <condition> ORDER BY <fields_order> <order>
+        """
+         Реализован запрос вида: SELECT <fields_name> FROM <table_name> WHERE <condition> ORDER BY <fields_order>
+         <order>
         :param table_name: название таблицы
         :param fields_name: название полей, данные по которым надо вывести. Перечисляются в кавычках через запятую
         :param condition: условаия выборки данных в кавычках через запятую
         :param fields_order: поле по которому упорядочивается
-        :param order: порядок вывода данных DESC - в обратном порядке. Если ничего не указывать, то по умолчанию выводится в прямом
+        :param order: порядок вывода данных DESC - в обратном порядке. Если ничего не указывать, то по умолчанию
+                выводится в прямом
         :param fetch: если указать 'one', то возьмется верхняя строка из таблицы. По умолчанию выводятся все
-        :return: возвращается словарь, если одна строка или если требуется из всех строк вывести только строку с последней проверкой, и список словарей, если больше одной строки
-        '''
-
-        ''''''
+        :return: возвращается словарь, если одна строка или если требуется из всех строк вывести только строку с
+                последней проверкой, и список словарей, если больше одной строки
+        """
 
         query_body = f"SELECT {fields_name} FROM {table_name}"
         condition = f"WHERE {condition}" if condition else False
@@ -222,7 +215,8 @@ class PostgresqlOperations():
                condition: str = False):
         """
         Реализуется запрос вида
-        UPDATE <ИМЯ ТАБЛИЦЫ> SET <НА КАКОЕ ЗНАЧЕНИЕ В КАКОМ ПОЛЕ МЕНЯЕТСЯ> WHERE <УСЛОВИЕ КАКИЕ ПОЛЯ ОТБИРАЮТСЯ ДЛЯ ЗАМЕНЫ>
+        UPDATE <ИМЯ ТАБЛИЦЫ> SET <НА КАКОЕ ЗНАЧЕНИЕ В КАКОМ ПОЛЕ МЕНЯЕТСЯ> WHERE <УСЛОВИЕ КАКИЕ ПОЛЯ ОТБИРАЮТСЯ
+        ДЛЯ ЗАМЕНЫ>
         """
         update = f"UPDATE {table}"
         set_ = f"SET {field_name}"
@@ -236,13 +230,14 @@ class PostgresqlOperations():
         self.__connection.commit()
         self.__close()
 
-db = PostgresqlOperations(user='andrey', password='password', database='database')
 
-# db.create_table(table_name='sites_list', datas_structure=(('id bigint primary key generated always as identity'),
-#                                                      ('name varchar(255) unique'),
-#                                                      ('created_at date'))
-#                 )
+# db = PostgresqlOperations(user='andrey', password='password', database='database')
 #
+# # db.create_table(table_name='sites_list', datas_structure=(('id bigint primary key generated always as identity'),
+# #                                                      ('name varchar(255) unique'),
+# #                                                      ('created_at date'))
+# #                 )
+# #
 # db.create_table(table_name='checks_info', datas_structure=(('id bigint primary key generated always as identity'),
 #                                                            ('sites_list_id bigint REFERENCES sites_list (id)'),
 #                                                            ('code_response varchar(255)'),
