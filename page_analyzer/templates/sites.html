@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <main class="flex-grow-1">
+    <div class="container-lg mt-3">
+      <h1>Сайты</h1>
+
+
+<div class="table-responsive">
+  <table class="table table-bordered table-hover text-nowrap" data-test="urls" >
+    <thead>
+    <tr>
+      <th>ID</th>
+      <th>Имя</th>
+      <th>Последняя проверка</th>
+      <th>Код ответа</th>
+    </tr>
+    </thead>
+    <tbody>
+      {% for row in sites_list %}
+      <tr>
+
+        {% if row['id'] %}
+        <td>{{ row['id'] }}</td>
+        {% else %}
+        <td></td>
+        {% endif %}
+
+        {% if row['name'] %}
+        <td><a href="/urls/{{ row['id'] }}">{{ row['name'] }}</a></td>
+        {% else %}
+        <td></td>
+        {% endif %}
+
+        {% if row['date_last_check'] %}
+        <td>{{ row['date_last_check'] }}</td>
+        {% else %}
+        <td></td>
+        {% endif %}
+
+        {% if row['last_code_response'] %}
+        <td>{{ row['last_code_response'] }}</td>
+        {% else %}
+        <td></td>
+        {% endif %}
+
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+    </div>
+  </main>
+{% endblock %}

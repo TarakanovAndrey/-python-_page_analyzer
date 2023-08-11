@@ -5,16 +5,25 @@ description = "Page analyzer"
 authors = ["Andrey Tarakanov <andrey.t-krd@yandex.ru>"]
 license = "Free"
 readme = "README.md"
-packages = [{include = "hexlet_code"}]
+packages = [{include = "page_analyzer"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
 flask = "^2.3.2"
 gunicorn = "^21.2.0"
+validators = "^0.20.0"
+psycopg2-binary = "^2.9.7"
+beautifulsoup4 = "^4.12.2"
+requests = "^2.31.0"
+
+
+
 
 
 [tool.poetry.group.dev.dependencies]
 flake8 = "^6.1.0"
+pytest = "^7.4.0"
+pyment = "^0.3.3"
 
 [build-system]
 requires = ["poetry-core"]
