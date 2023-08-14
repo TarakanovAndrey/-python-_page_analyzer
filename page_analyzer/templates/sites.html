@@ -18,34 +18,22 @@
     </thead>
     <tbody>
       {% for row in sites_list %}
+
       <tr>
 
-        {% if row['id'] %}
+
         <td>{{ row['id'] }}</td>
-        {% else %}
-        <td></td>
-        {% endif %}
 
-        {% if row['name'] %}
         <td><a href="/urls/{{ row['id'] }}">{{ row['name'] }}</a></td>
-        {% else %}
-        <td></td>
-        {% endif %}
 
-        {% if row['date_last_check'] %}
-        <td>{{ row['date_last_check'] }}</td>
-        {% else %}
-        <td></td>
-        {% endif %}
+        <td>{{ row['created_at_last_check'] }}</td>
 
-        {% if row['last_code_response'] %}
-        <td>{{ row['last_code_response'] }}</td>
-        {% else %}
-        <td></td>
-        {% endif %}
+        <td>{{ row['status_code_last_check'] }}</td>
+
 
       </tr>
       {% endfor %}
+
     </tbody>
   </table>
 </div>

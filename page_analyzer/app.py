@@ -1,9 +1,8 @@
 import requests
 import os
-from flask import Flask, render_template, request, url_for, redirect
+from flask import Flask, render_template, request, url_for, redirect, flash, get_flashed_messages
 from urllib.parse import urlparse
 from validators import url
-from datetime import datetime
 from page_analyzer.database_operations import PostgresqlOperations
 from bs4 import BeautifulSoup
 
@@ -36,52 +35,55 @@ def index():
 @app.route('/', methods=['POST'])
 def request_processing():
     entered_request = request.form.to_dict()['url']
-    url_site = urlparse(entered_request).scheme + '://' + urlparse(entered_request).netloc
-    dates_create = datetime.now().date()
+    url_site = f"{urlparse(entered_request).scheme}://{urlparse(entered_request).netloc}"
 
-    if url(url_site) is True:
-        db.insert_unique("sites_list", name=url_site, created_at=dates_create)
+    if not entered_request:
+        flash('URL обязателен')
+        messages = get_flashed_messages()
+        return render_template('index.html', messages=messages)
+    elif url(url_site) is not True:
+        flash('Некорректный URL')
+        messages = get_flashed_messages()
+        return render_template('index.html', messages=messages)
+    elif url(url_site) is True:
+        if db.check_exists(table_name='urls', fields_name='name', condition=f"name = '{url_site}'")['answer'] is False:
+            flash('Страница успешно добавлена')
 
-    rows_id = db.select('sites_list', fields_name='*', condition=f"name = '{url_site}'")['id']
-    # еще раз посмотреть про вставку с возвратом последней вставленной строки
-    return redirect(url_for('show_site_info', site_id=rows_id, url_site=url_site))
+        db.insert_unique("urls", name=url_site)
+        url_id = db.select('urls', fields_name=('id',), condition=f"name = '{url_site}'")['id']
+
+        return redirect(url_for('show_site_info', site_id=url_id))
 
 
 @app.route('/urls', methods=['GET'])
 def get_sites_list():
-    sites_list = db.select(table_name='sites_list', fields_name='*', fields_order='id', order='DESC')
+    sites_list = db.select_special()
+
     return render_template('sites.html', sites_list=sites_list)
 
 
 @app.route('/urls/<site_id>', methods=['GET'])
 def show_site_info(site_id):
-    url_info = db.select('sites_list', fields_name='*', condition=f"id = {site_id}")
 
-    checks_list = db.select(table_name='checks_info',
-                            fields_name='*',
-                            condition=f"sites_list_id = {site_id}",
+    messages = get_flashed_messages()
+    url_info = db.select('urls', fields_name='*', condition=f"id = {site_id}")
+    checks_list = db.select(table_name='url_checks',
+                            fields_name=('id', 'status_code', 'h1', 'title', 'description', 'created_at'),
+                            condition=f"url_id = {site_id}",
                             fields_order='id', order='DESC')
 
-    return render_template('url_info.html', url_info=url_info, checks_list=checks_list)
+    return render_template('url_info.html', url_info=url_info, checks_list=checks_list, messages=messages)
 
 
 @app.route('/urls/<site_id>/checks', methods=['POST'])
 def check_url(site_id):
-    url_site = db.select('sites_list', fields_name='*', condition=f"id = {site_id}")['name']
-
+    url_site = db.select('urls', fields_name=('name',), condition=f"id = {site_id}")['name']
     checks_result = get_site_info(url_site)
-
-    dates_create = datetime.now().date()
-    db.insert("checks_info",
-              sites_list_id=site_id,
-              code_response=checks_result['status_code'],
+    db.insert("url_checks",
+              url_id=site_id,
+              status_code=checks_result['status_code'],
               h1=checks_result['h1'],
               title=checks_result['title'],
-              description=checks_result['description'],
-              created_at=dates_create)
-
-    db.update(table='sites_list',
-              field_name=f"date_last_check = '{dates_create}', last_code_response = '{checks_result['status_code']}'",
-              condition=f"name = '{url_site}'")
+              description=checks_result['description'])
 
     return redirect(url_for('show_site_info', site_id=site_id))
