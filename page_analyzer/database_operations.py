@@ -55,22 +55,6 @@ class PostgresqlOperations:
     def __close(self):
         self.__connection.close()
 
-    def create_table(self, table_name, datas_structure):
-        query = f"CREATE TABLE IF NOT EXISTS {table_name} ({', '.join(datas_structure)});"
-
-        self.__open()
-        self.__cursor.execute(query)
-
-        self.__connection.commit()
-        self.__close()
-
-    def drop_table(self, table_name):
-        query = f"DROP TABLE IF EXISTS {table_name}"
-        self.__open()
-        self.__cursor.execute(query)
-        self.__connection.commit()
-        self.__close()
-
     def delete(self, table,
                where: str = False):
 
@@ -234,16 +218,3 @@ class PostgresqlOperations:
         self.__connection.commit()
         self.__close()
 
-
-# db = PostgresqlOperations(user='andrey', password='password', database='database')
-#
-# db.create_table(table_name='urls', datas_structure=('id bigint primary key generated always as identity',
-#                                                     'name varchar(255) UNIQUE',
-#                                                     'created_at date DEFAULT CURRENT_DATE'))
-# #
-# #
-# db.create_table(table_name='url_checks', datas_structure=('id bigint primary key generated always as identity',
-#                                                           'url_id bigint REFERENCES urls (id)',
-#                                                           'status_code varchar(255)', 'h1 text', 'title text',
-#                                                           'description text',
-#                                                           'created_at timestamp DEFAULT CURRENT_TIMESTAMP'))

@@ -10,9 +10,9 @@ from bs4 import BeautifulSoup
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
-db = PostgresqlOperations(user='andrey', password='password', database='database')
-# DATABASE_URL = os.getenv('DATABASE_URL')
-# db = PostgresqlOperations(DATABASE_URL)
+# db = PostgresqlOperations(user='andrey', password='password', database='database')
+DATABASE_URL = os.getenv('DATABASE_URL')
+db = PostgresqlOperations(DATABASE_URL)
 
 
 def get_site_info(sites_url):
