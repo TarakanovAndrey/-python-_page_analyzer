@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS urls;
+DROP TABLE IF EXISTS urls CASCADE;
 
 CREATE TABLE IF NOT EXISTS urls (
 id bigint primary key generated always as identity,
@@ -6,7 +6,7 @@ name varchar(255) unique,
 created_at timestamp DEFAULT CURRENT_TIMESTAMP);
 
 
-DROP TABLE IF EXISTS url_checks;
+DROP TABLE IF EXISTS url_checks CASCADE;
 
 CREATE TABLE IF NOT EXISTS url_checks (
 id bigint primary key generated always as identity,
