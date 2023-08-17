@@ -91,7 +91,7 @@ def check_url(site_id):
     checks_result = get_site_info(url_site)
     if checks_result is False:
         flash('Произошла ошибка при проверке', 'error')
-        return redirect(url_for('show_site_info', site_id=site_id))
+        return redirect(url_for('show_site_info', site_id=site_id))  # можно удалить
     else:
         flash('Страница успешно проверена', 'success')
         db.insert("url_checks",
