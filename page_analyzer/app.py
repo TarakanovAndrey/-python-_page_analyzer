@@ -39,6 +39,7 @@ def index():
 
 @app.route('/', methods=['POST'])
 def request_processing():
+    # возможно обработчик поменять на /urls
     entered_request = request.form.to_dict()['url']
     url_site = f"{urlparse(entered_request).scheme}://{urlparse(entered_request).netloc}"
 
