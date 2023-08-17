@@ -52,13 +52,14 @@ def request_processing():
         messages = get_flashed_messages()
         return render_template('index.html', messages=messages)
     elif url(url_site):
-        if db.check_exists(table_name='urls', fields_name='name', condition=f"name = '{url_site}'")['answer'] is False:
+        check_exists = db.check_exists(table_name='urls', fields_name='name', condition=f"name = '{url_site}'")['answer']
+        if not check_exists:
             db.insert_unique("urls", name=url_site)
             url_id = db.select('urls', fields_name=('id',), condition=f"name = '{url_site}'")[0]['id']
             flash('Страница успешно добавлена', 'success')
             return redirect(url_for('show_site_info', site_id=url_id))
 
-        elif db.check_exists(table_name='urls', fields_name='name', condition=f"name = '{url_site}'")['answer'] is True:
+        elif check_exists:
             flash('Страница уже существует', 'success')
             url_id = db.select('urls', fields_name=('id',), condition=f"name = '{url_site}'")[0]['id']
             return redirect(url_for('show_site_info', site_id=url_id))
