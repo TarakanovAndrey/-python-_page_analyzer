@@ -1,6 +1,4 @@
 import psycopg2
-# import os
-# from dotenv import load_dotenv, dotenv_values
 
 
 def datas_to_dict(items):
@@ -16,15 +14,10 @@ def datas_to_dict(items):
             dict_[key] = value
         rows.append(dict_)
 
-    if len(rows) > 1:
-        return tuple(rows)
-    elif len(rows) == 1:
-        return rows[0]
-    return rows
+    return tuple(rows)
 
 
 class PostgresqlOperations:
-    __instance = None
     __cursor = None
     __connection = None
 
@@ -42,24 +35,6 @@ class PostgresqlOperations:
 
     def __close(self):
         self.__connection.close()
-
-    def delete(self, table,
-               where: str = False):
-
-        """
-        Реализуется запрос формата
-        DELETE FROM <НАЗВАНИЕ ТАБЛИЦЫ> WHERE <УСЛОВИЕ ПО КОТОРОМУ УДАЛЯЕТСЯ СТРОКА ИЛИ СТРОКИ>
-        """
-        delete = f"DELETE FROM {table}"
-        where = f"WHERE {where}" if where else False
-        queries_body = (delete, where)
-        query = ' '.join(filter(lambda x: bool(x), queries_body)) + ';'
-
-        self.__open()
-        self.__cursor.execute(query)
-
-        self.__connection.commit()
-        self.__close()
 
     def insert(self, *args, **kwargs):
         table_name = args[0]
@@ -134,6 +109,7 @@ class PostgresqlOperations:
 
         query_items = (query_body, condition, order, group)
         query = ' '.join(item for item in query_items if item) + ';'
+        print(query)
 
         self.__open()
         self.__cursor.execute(query)
@@ -185,32 +161,3 @@ class PostgresqlOperations:
         self.__close()
 
         return {'answer': rows[0][0]}
-
-    def update(self, table,
-               field_name,
-               condition: str = False):
-        """
-        Реализуется запрос вида
-        UPDATE <ИМЯ ТАБЛИЦЫ> SET <НА КАКОЕ ЗНАЧЕНИЕ В КАКОМ ПОЛЕ МЕНЯЕТСЯ> WHERE <УСЛОВИЕ КАКИЕ ПОЛЯ ОТБИРАЮТСЯ
-        ДЛЯ ЗАМЕНЫ>
-        """
-        update = f"UPDATE {table}"
-        set_ = f"SET {field_name}"
-        condition = f"WHERE {condition}" if condition else False
-        queries_body = (update, set_, condition)
-        query = ' '.join(filter(lambda x: bool(x), queries_body)) + ';'
-
-        self.__open()
-        self.__cursor.execute(query)
-
-        self.__connection.commit()
-        self.__close()
-
-
-# load_dotenv()
-# DATABASE_URL = dotenv_values()['DATABASE_URL']
-#
-#
-# db = PostgresqlOperations(DATABASE_URL)
-#
-# print(db.select('urls', fields_name='*'))
