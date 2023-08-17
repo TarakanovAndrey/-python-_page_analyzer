@@ -1,6 +1,6 @@
 import requests
 import os
-from dotenv import load_dotenv, dotenv_values
+
 from flask import Flask, render_template, request, url_for, redirect, flash, get_flashed_messages
 from urllib.parse import urlparse
 from validators import url
@@ -12,10 +12,6 @@ app = Flask(__name__)
 
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
-# проблема в парсинге урла
-
-# load_dotenv()
-# DATABASE_URL = dotenv_values()['DATABASE_URL']
 DATABASE_URL = os.getenv('DATABASE_URL')
 
 
