@@ -12,8 +12,12 @@ app = Flask(__name__)
 
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
-load_dotenv()
-DATABASE_URL = dotenv_values()['DATABASE_URL']
+# проблема в парсинге урла
+
+# load_dotenv()
+# DATABASE_URL = dotenv_values()['DATABASE_URL']
+DATABASE_URL = os.getenv('DATABASE_URL')
+
 
 db = PostgresqlOperations(DATABASE_URL)
 
