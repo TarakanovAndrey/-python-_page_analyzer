@@ -53,12 +53,15 @@ def request_processing():
         return render_template('index.html', messages=messages)
     elif url(url_site) is True:
         if db.check_exists(table_name='urls', fields_name='name', condition=f"name = '{url_site}'")['answer'] is False:
+            db.insert_unique("urls", name=url_site)
+            url_id = db.select('urls', fields_name=('id',), condition=f"name = '{url_site}'")[0]['id']
             flash('Страница успешно добавлена', 'success')
+            return redirect(url_for('show_site_info', site_id=url_id))
 
-        db.insert_unique("urls", name=url_site)
-        url_id = db.select('urls', fields_name=('id',), condition=f"name = '{url_site}'")[0]['id']
-
-        return redirect(url_for('show_site_info', site_id=url_id))
+        elif db.check_exists(table_name='urls', fields_name='name', condition=f"name = '{url_site}'")['answer'] is True:
+            flash('Страница уже существует', 'success')
+            url_id = db.select('urls', fields_name=('id',), condition=f"name = '{url_site}'")[0]['id']
+            return redirect(url_for('show_site_info', site_id=url_id))
 
 
 @app.route('/urls', methods=['GET'])

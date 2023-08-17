@@ -109,7 +109,6 @@ class PostgresqlOperations:
 
         query_items = (query_body, condition, order, group)
         query = ' '.join(item for item in query_items if item) + ';'
-        print(query)
 
         self.__open()
         self.__cursor.execute(query)
