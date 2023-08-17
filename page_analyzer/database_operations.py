@@ -1,4 +1,6 @@
 import psycopg2
+# import os
+# from dotenv import load_dotenv, dotenv_values
 
 
 def datas_to_dict(items):
@@ -22,30 +24,16 @@ def datas_to_dict(items):
 
 
 class PostgresqlOperations:
-
     __instance = None
-    __host = None
-    __user = None
-    __password = None
-    __database = None
     __cursor = None
     __connection = None
 
-    def __init__(self, host='localhost',
-                 user='nester',
-                 password='',
-                 database=''):
-
-        self.__host = host
-        self.__user = user
-        self.__password = password
-        self.__database = database
+    def __init__(self, db_url):
+        self.__db_url = db_url
 
     def __open(self):
         try:
-            self.__connection = psycopg2.connect(database=self.__database,
-                                                 user=self.__user,
-                                                 password=self.__password)
+            self.__connection = psycopg2.connect(self.__db_url)
             self.__cursor = self.__connection.cursor()
 
         except psycopg2.DatabaseError:
@@ -66,7 +54,7 @@ class PostgresqlOperations:
         where = f"WHERE {where}" if where else False
         queries_body = (delete, where)
         query = ' '.join(filter(lambda x: bool(x), queries_body)) + ';'
-        print(query)
+
         self.__open()
         self.__cursor.execute(query)
 
@@ -79,7 +67,7 @@ class PostgresqlOperations:
         values = ', '.join(f"'{x}'" for x in kwargs.values())
 
         query = f"INSERT INTO {table_name} ({fields_name}) VALUES ({values}) RETURNING id;"
-        print(query)
+
         self.__open()
         self.__cursor.execute(query)
 
@@ -218,3 +206,11 @@ class PostgresqlOperations:
         self.__connection.commit()
         self.__close()
 
+
+# load_dotenv()
+# DATABASE_URL = dotenv_values()['DATABASE_URL']
+#
+#
+# db = PostgresqlOperations(DATABASE_URL)
+#
+# print(db.select('urls', fields_name='*'))

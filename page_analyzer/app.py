@@ -1,5 +1,6 @@
 import requests
 import os
+from dotenv import load_dotenv, dotenv_values
 from flask import Flask, render_template, request, url_for, redirect, flash, get_flashed_messages
 from urllib.parse import urlparse
 from validators import url
@@ -8,10 +9,12 @@ from bs4 import BeautifulSoup
 
 
 app = Flask(__name__)
+
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
-# db = PostgresqlOperations(user='andrey', password='password', database='database')
-DATABASE_URL = os.getenv('DATABASE_URL')
+load_dotenv()
+DATABASE_URL = dotenv_values()['DATABASE_URL']
+
 db = PostgresqlOperations(DATABASE_URL)
 
 
