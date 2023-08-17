@@ -7,6 +7,7 @@ from validators import url
 from page_analyzer.database_operations import PostgresqlOperations
 from bs4 import BeautifulSoup
 
+# sdjfsd
 
 app = Flask(__name__)
 
