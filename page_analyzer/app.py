@@ -6,7 +6,7 @@ from validators import url
 from page_analyzer.database_operations import PostgresqlOperations
 from bs4 import BeautifulSoup
 
-
+# сохранять данные в сессию
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
@@ -47,11 +47,11 @@ def request_processing():
         flash('URL обязателен')
         messages = get_flashed_messages()
         return render_template('index.html', messages=messages)
-    elif url(url_site) is not True:
+    elif not url(url_site):
         flash('Некорректный URL')
         messages = get_flashed_messages()
         return render_template('index.html', messages=messages)
-    elif url(url_site) is True:
+    elif url(url_site):
         if db.check_exists(table_name='urls', fields_name='name', condition=f"name = '{url_site}'")['answer'] is False:
             db.insert_unique("urls", name=url_site)
             url_id = db.select('urls', fields_name=('id',), condition=f"name = '{url_site}'")[0]['id']
