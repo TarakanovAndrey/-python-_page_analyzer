@@ -177,9 +177,9 @@ class PostgresqlOperations:
         self.__close()
 
         return {'answer': rows[0][0]}
-DATABASE_URL = os.getenv('DATABASE_URL')
-
-db = PostgresqlOperations(DATABASE_URL)
-
-answer = db.check_exists(condition=f"name='https://ru.hexlet.io'")
-print(answer)
+# DATABASE_URL = os.getenv('DATABASE_URL')
+#
+# db = PostgresqlOperations(DATABASE_URL)
+#
+# answer = db.check_exists(condition=f"name='https://ru.hexlet.io'")
+# print(answer)
