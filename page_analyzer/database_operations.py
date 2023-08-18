@@ -21,7 +21,7 @@ class PostgresqlOperations:
 
     def __init__(self, db_url):
         self.__db_url = db_url
-        self.connect = psycopg2.connect(self.__db_url)
+
 
     def insert(self, *args, **kwargs):
         table_name = args[0]
@@ -30,8 +30,10 @@ class PostgresqlOperations:
 
         query = f"INSERT INTO {table_name} ({fields_name}) VALUES ({values}) RETURNING id;"
 
-        with self.connect.cursor() as cursor:
+        with psycopg2.connect(self.__db_url) as connect:
+            cursor = connect.cursor()
             cursor.execute(query)
+        connect.close()
 
     def insert_unique(self, *args, **kwargs):
         table_name = args[0]
@@ -41,8 +43,10 @@ class PostgresqlOperations:
         query = f'''INSERT INTO {table_name} ({fields_name})
                     VALUES ({values}) ON CONFLICT (name) DO NOTHING;'''
 
-        with self.connect.cursor() as cursor:
+        with psycopg2.connect(self.__db_url) as connect:
+            cursor = connect.cursor()
             cursor.execute(query)
+        connect.close()
 
     def get_heads_table(self, table_name):
         """Вывод названия всех полей таблицы"""
@@ -52,9 +56,11 @@ class PostgresqlOperations:
                  f"WHERE table_schema = 'public' "
                  f"AND table_name = '{table_name}' ORDER BY ordinal_position ASC")
 
-        with self.connect.cursor() as cursor:
+        with psycopg2.connect(self.__db_url) as connect:
+            cursor = connect.cursor()
             cursor.execute(query)
             rows = cursor.fetchall()
+        connect.close()
 
         return rows
 
@@ -90,7 +96,8 @@ class PostgresqlOperations:
         query_items = (query_body, condition, order, group)
         query = ' '.join(item for item in query_items if item) + ';'
 
-        with self.connect.cursor() as cursor:
+        with psycopg2.connect(self.__db_url) as connect:
+            cursor = connect.cursor()
             cursor.execute(query)
             if fetch == 'one':
                 rows = cursor.fetchone()
@@ -102,6 +109,7 @@ class PostgresqlOperations:
         else:
             column_name = fields_name
         out = datas_to_dict({'column_name': column_name, 'rows': rows})
+        connect.close()
 
         return out
 
@@ -113,9 +121,11 @@ class PostgresqlOperations:
                     WHERE url_checks.created_at = (SELECT MAX(created_at)
                     FROM url_checks WHERE urls.id = url_checks.url_id)
                     OR url_checks.created_at IS NULL ORDER BY urls.id DESC;'''
-        with self.connect.cursor() as cursor:
+        with psycopg2.connect(self.__db_url) as connect:
+            cursor = connect.cursor()
             cursor.execute(query)
             rows = cursor.fetchall()
+        connect.close()
 
         column_name = ('id', 'name', 'status_code_last_check', 'created_at_last_check')
         out = datas_to_dict({'column_name': column_name, 'rows': rows})
@@ -126,8 +136,9 @@ class PostgresqlOperations:
                      condition: str = None):
 
         query = f"SELECT EXISTS (SELECT {fields_name} FROM {table_name} WHERE {condition});"
-        with self.connect.cursor() as cursor:
+        with psycopg2.connect(self.__db_url) as connect:
+            cursor = connect.cursor()
             cursor.execute(query)
             rows = cursor.fetchall()
-
+        connect.close()
         return {'answer': rows[0][0]}
