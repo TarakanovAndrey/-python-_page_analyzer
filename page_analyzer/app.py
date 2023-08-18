@@ -44,8 +44,7 @@ def index():
 def request_processing():
     entered_request = request.form.to_dict()['url']
     url_site = f"{urlparse(entered_request).scheme}://{urlparse(entered_request).netloc}"
-    print(entered_request)
-    print(url_site)
+
     if not entered_request:
         flash('URL обязателен')
         messages = get_flashed_messages()
@@ -53,7 +52,7 @@ def request_processing():
     elif not url(url_site, public=True):
         flash('Некорректный URL')
         messages = get_flashed_messages()
-        return render_template('index.html', messages=messages)
+        return render_template('index.html', messages=messages), 422
     elif url(url_site, public=True):
         check_exists = db.check_exists(table_name='urls',
                                        fields_name='name',
