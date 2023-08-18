@@ -42,23 +42,23 @@ def index():
 
 @app.route('/urls', methods=['POST'])
 def request_processing():
-    # возможно обработчик поменять на /urls
     entered_request = request.form.to_dict()['url']
     url_site = f"{urlparse(entered_request).scheme}://{urlparse(entered_request).netloc}"
-
+    print(entered_request)
+    print(url_site)
     if not entered_request:
         flash('URL обязателен')
         messages = get_flashed_messages()
         return render_template('index.html', messages=messages)
-    elif not url(url_site):
+    elif not url(url_site, public=True):
         flash('Некорректный URL')
         messages = get_flashed_messages()
         return render_template('index.html', messages=messages)
-    elif url(url_site):
+    elif url(url_site, public=True):
         check_exists = db.check_exists(table_name='urls',
                                        fields_name='name',
                                        condition=f"name = '{url_site}'")['answer']
-        print(check_exists)
+
         if not check_exists:
             db.insert_unique("urls", name=url_site)
             url_id = db.select('urls', fields_name=('id',), condition=f"name = '{url_site}'")[0]['id']
