@@ -18,8 +18,8 @@ def datas_to_dict(items):
 
 
 class PostgresqlOperations:
-    # __cursor = None
-    # __connection = None
+    __cursor = None
+    __connection = None
 
     def __init__(self, db_url):
         self.__db_url = db_url
