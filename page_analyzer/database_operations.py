@@ -18,18 +18,11 @@ def datas_to_dict(items):
 
 
 class PostgresqlOperations:
-    __cursor = None
-    __connection = None
-    __instance = None
-    __database = None
-
-    def __new__(cls, *args, **kwargs):
-        if not cls.__instance or not cls.__database:
-            cls.__instance = super(PostgresqlOperations, cls).__new__(cls, *args, **kwargs)
-        return cls.__instance
 
     def __init__(self, db_url):
         self.__db_url = db_url
+        self.__cursor = None
+        self.__connection = None
 
     def __open(self):
         try:
@@ -169,6 +162,3 @@ class PostgresqlOperations:
         self.__close()
 
         return {'answer': rows[0][0]}
-
-
-
