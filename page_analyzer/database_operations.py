@@ -1,7 +1,7 @@
 import psycopg2
 from psycopg2 import Error
 
-# проблема с коннектом базы данных
+
 def datas_to_dict(items):
     keys = items['column_name']
     values = items['rows']
