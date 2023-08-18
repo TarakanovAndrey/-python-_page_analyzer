@@ -40,7 +40,7 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/', methods=['POST'])
+@app.route('/urls', methods=['POST'])
 def request_processing():
     # возможно обработчик поменять на /urls
     entered_request = request.form.to_dict()['url']
