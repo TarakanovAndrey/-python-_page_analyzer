@@ -1,4 +1,5 @@
 import psycopg2
+import os
 
 
 def datas_to_dict(items):
@@ -147,16 +148,38 @@ class PostgresqlOperations:
         out = datas_to_dict({'column_name': column_name, 'rows': rows})
         return out
 
-    def check_exists(self, table_name: str,
-                     fields_name: (tuple, str) = None,
-                     condition: str = None):
+    # def check_exists(self, table_name: str,
+    #                  fields_name: (tuple, str) = None,
+    #                  condition: str = None):
+    #
+    #     query = f"SELECT EXISTS (SELECT {fields_name} FROM {table_name} WHERE {condition});"
+    #     print(query)
+    #
+    #     self.__open()
+    #     self.__cursor.execute(query)
+    #     print(self.__cursor.execute(query))
+    #     rows = self.__cursor.fetchall()
+    #     self.__connection.commit()
+    #     self.__close()
+    #
+    #     return {'answer': rows[0][0]}
 
-        query = f"SELECT EXISTS (SELECT {fields_name} FROM {table_name} WHERE {condition});"
+    def check_exists(self, condition: str = None):
+
+        query = f"SELECT EXISTS (SELECT name FROM urls WHERE {condition});"
+        print(query)
 
         self.__open()
         self.__cursor.execute(query)
+        print(self.__cursor.execute(query))
         rows = self.__cursor.fetchall()
         self.__connection.commit()
         self.__close()
 
         return {'answer': rows[0][0]}
+DATABASE_URL = os.getenv('DATABASE_URL')
+
+db = PostgresqlOperations(DATABASE_URL)
+
+answer = db.check_exists(condition=f"name='https://ru.hexlet.io'")
+print(answer)
