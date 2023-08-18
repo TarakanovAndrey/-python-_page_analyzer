@@ -147,7 +147,7 @@ class PostgresqlOperations:
                      condition: str = None):
 
         query = f"SELECT EXISTS (SELECT {fields_name} FROM {table_name} WHERE {condition});"
-        cursor = self.__connect()
+
         with psycopg2.connect(self.__db_url) as connect:
             try:
                 cursor = connect.cursor()
