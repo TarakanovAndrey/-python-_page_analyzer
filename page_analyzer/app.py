@@ -5,6 +5,9 @@ from urllib.parse import urlparse
 from validators import url
 from page_analyzer.database_operations import PostgresqlOperations
 from bs4 import BeautifulSoup
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # сохранять данные в сессию
 app = Flask(__name__)
