@@ -52,9 +52,10 @@ def request_processing():
         messages = get_flashed_messages()
         return render_template('index.html', messages=messages)
     elif url(url_site):
-        check_exists = db.check_exists(table_name='urls',
-                                       fields_name='name',
-                                       condition=f"name = '{url_site}'")['answer']
+        check_exists = db.select(table_name='urls',
+                                 fields_name=('name',),
+                                 condition=f"name = '{url_site}'")
+        # print(check_exists)
         if not check_exists:
             db.insert_unique("urls", name=url_site)
             url_id = db.select('urls', fields_name=('id',), condition=f"name = '{url_site}'")[0]['id']

@@ -147,18 +147,17 @@ class PostgresqlOperations:
         out = datas_to_dict({'column_name': column_name, 'rows': rows})
         return out
 
-    def check_exists(self, table_name: str,
-                     fields_name: (tuple, str) = None,
-                     condition: str = None):
-
-        query = f"SELECT EXISTS (SELECT {fields_name} FROM {table_name} WHERE {condition});"
-        print(query)
-
-        self.__open()
-        self.__cursor.execute(query)
-        print(self.__cursor.execute(query))
-        rows = self.__cursor.fetchall()
-        self.__connection.commit()
-        self.__close()
-
-        return {'answer': rows[0][0]}
+    # def check_exists(self, table_name: str,
+    #                  fields_name: (tuple, str) = None,
+    #                  condition: str = None):
+    #
+    #     query = f"SELECT EXISTS (SELECT {fields_name} FROM {table_name} WHERE {condition});"
+    #     print(query)
+    #
+    #     self.__open()
+    #     self.__cursor.execute(query)
+    #     rows = self.__cursor.fetchall()
+    #     self.__connection.commit()
+    #     self.__close()
+    #
+    #     return {'answer': rows[0][0]}
