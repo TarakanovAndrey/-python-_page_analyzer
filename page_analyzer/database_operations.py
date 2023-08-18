@@ -21,20 +21,6 @@ class PostgresqlOperations:
 
     def __init__(self, db_url):
         self.__db_url = db_url
-        self.__cursor = None
-        self.__connection = None
-
-    def __open(self):
-        try:
-            self.__connection = psycopg2.connect(self.__db_url)
-            self.__cursor = self.__connection.cursor()
-
-        except psycopg2.DatabaseError:
-            print("Can't establish connection to database")
-            '''Прописать откат любых изменений в случае ошибки подключения. rollback'''
-
-    def __close(self):
-        self.__connection.close()
 
     def insert(self, *args, **kwargs):
         table_name = args[0]
@@ -43,11 +29,9 @@ class PostgresqlOperations:
 
         query = f"INSERT INTO {table_name} ({fields_name}) VALUES ({values}) RETURNING id;"
 
-        self.__open()
-        self.__cursor.execute(query)
-
-        self.__connection.commit()
-        self.__close()
+        with psycopg2.connect(self.__db_url) as connect:
+            cursor = connect.cursor()
+            cursor.execute(query)
 
     def insert_unique(self, *args, **kwargs):
         table_name = args[0]
@@ -57,11 +41,9 @@ class PostgresqlOperations:
         query = f'''INSERT INTO {table_name} ({fields_name})
                     VALUES ({values}) ON CONFLICT (name) DO NOTHING;'''
 
-        self.__open()
-        self.__cursor.execute(query)
-
-        self.__connection.commit()
-        self.__close()
+        with psycopg2.connect(self.__db_url) as connect:
+            cursor = connect.cursor()
+            cursor.execute(query)
 
     def get_heads_table(self, table_name):
         """Вывод названия всех полей таблицы"""
@@ -71,11 +53,11 @@ class PostgresqlOperations:
                  f"WHERE table_schema = 'public' "
                  f"AND table_name = '{table_name}' ORDER BY ordinal_position ASC")
 
-        self.__open()
-        self.__cursor.execute(query)
-        rows = self.__cursor.fetchall()
-        self.__connection.commit()
-        self.__close()
+        with psycopg2.connect(self.__db_url) as connect:
+            cursor = connect.cursor()
+            cursor.execute(query)
+            rows = cursor.fetchall()
+
         return rows
 
     def select(self, table_name: str,
@@ -110,16 +92,13 @@ class PostgresqlOperations:
         query_items = (query_body, condition, order, group)
         query = ' '.join(item for item in query_items if item) + ';'
 
-        self.__open()
-        self.__cursor.execute(query)
-
-        if fetch == 'one':
-            rows = self.__cursor.fetchone()
-        else:
-            rows = self.__cursor.fetchall()
-
-        self.__connection.commit()
-        self.__close()
+        with psycopg2.connect(self.__db_url) as connect:
+            cursor = connect.cursor()
+            cursor.execute(query)
+            if fetch == 'one':
+                rows = cursor.fetchone()
+            else:
+                rows = cursor.fetchall()
 
         if fields_name == '*':
             column_name = tuple([x[0] for x in self.get_heads_table(table_name='urls')])
@@ -137,27 +116,23 @@ class PostgresqlOperations:
                     WHERE url_checks.created_at = (SELECT MAX(created_at)
                     FROM url_checks WHERE urls.id = url_checks.url_id)
                     OR url_checks.created_at IS NULL ORDER BY urls.id DESC;'''
-        self.__open()
-        self.__cursor.execute(query)
-        rows = self.__cursor.fetchall()
+        with psycopg2.connect(self.__db_url) as connect:
+            cursor = connect.cursor()
+            cursor.execute(query)
+            rows = cursor.fetchall()
 
-        self.__connection.commit()
-        self.__close()
         column_name = ('id', 'name', 'status_code_last_check', 'created_at_last_check')
         out = datas_to_dict({'column_name': column_name, 'rows': rows})
         return out
 
-    # def check_exists(self, table_name: str,
-    #                  fields_name: (tuple, str) = None,
-    #                  condition: str = None):
-    #
-    #     query = f"SELECT EXISTS (SELECT {fields_name} FROM {table_name} WHERE {condition});"
-    #     print(query)
-    #
-    #     self.__open()
-    #     self.__cursor.execute(query)
-    #     rows = self.__cursor.fetchall()
-    #     self.__connection.commit()
-    #     self.__close()
-    #
-    #     return {'answer': rows[0][0]}
+    def check_exists(self, table_name: str,
+                     fields_name: (tuple, str) = None,
+                     condition: str = None):
+
+        query = f"SELECT EXISTS (SELECT {fields_name} FROM {table_name} WHERE {condition});"
+        with psycopg2.connect(self.__db_url) as connect:
+            cursor = connect.cursor()
+            cursor.execute(query)
+            rows = cursor.fetchall()
+
+        return {'answer': rows[0][0]}
