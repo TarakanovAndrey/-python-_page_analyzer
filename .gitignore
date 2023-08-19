@@ -3,3 +3,4 @@ __pycache__/
 .idea/
 dist/
 .env
+.pytest_cache/
