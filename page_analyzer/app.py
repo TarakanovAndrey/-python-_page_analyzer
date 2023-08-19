@@ -1,11 +1,10 @@
-import requests
 import os
 from flask import Flask, render_template, request, url_for, redirect, flash, get_flashed_messages
 from urllib.parse import urlparse
 from validators import url
 from page_analyzer.database_operations import PostgresqlOperations
-from bs4 import BeautifulSoup
 from dotenv import load_dotenv
+from page_analyzer.utility_function import get_site_info
 
 load_dotenv()
 
@@ -17,22 +16,6 @@ app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 DATABASE_URL = os.getenv('DATABASE_URL')
 
 db = PostgresqlOperations(DATABASE_URL)
-
-
-def get_site_info(sites_url):
-    page = requests.get(sites_url)
-    soup = BeautifulSoup(page.text, 'html.parser')
-
-    status_code = page.status_code
-    if status_code == 200:
-        h1 = soup.find('h1').get_text() if soup.find('h1') else ''
-        title = soup.find('title').get_text() if soup.find('title') else ''
-        description = soup.find(attrs=({'name': 'description'})).get('content') \
-            if soup.find(attrs=({'name': 'description'})) else ''
-        result = {'h1': h1, 'title': title, 'description': description, 'status_code': status_code}
-        return result
-    else:
-        return False
 
 
 @app.route('/')

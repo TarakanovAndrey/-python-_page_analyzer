@@ -1,21 +1,6 @@
 import psycopg2
 from psycopg2 import Error
-
-
-def datas_to_dict(items):
-    keys = items['column_name']
-    values = items['rows']
-    rows = list()
-    for item in values:
-        dict_ = {}
-        for key, value in zip(keys, item):
-            if value is None:
-                value = ''
-                dict_[key] = value
-            dict_[key] = value
-        rows.append(dict_)
-
-    return tuple(rows)
+from page_analyzer.utility_function import datas_to_dict
 
 
 class PostgresqlOperations:
@@ -79,22 +64,6 @@ class PostgresqlOperations:
                order: str = None,
                fetch: str = 'all',
                group: str = False):
-
-        """
-         Реализован запрос вида: SELECT <fields_name> FROM <table_name> WHERE <condition> ORDER BY <fields_order>
-         <order>
-        :param group:
-        :param table_name: название таблицы
-        :param fields_name: название полей, данные по которым надо вывести. Кортеж, перечисляются в
-         кавычках через запятую
-        :param condition: условаия выборки данных в кавычках через запятую
-        :param fields_order: поле по которому упорядочивается
-        :param order: порядок вывода данных DESC - в обратном порядке. Если ничего не указывать, то по умолчанию
-                выводится в прямом
-        :param fetch: если указать 'one', то возьмется верхняя строка из таблицы. По умолчанию выводятся все
-        :return: возвращается словарь, если одна строка или если требуется из всех строк вывести только строку с
-                последней проверкой, и список словарей, если больше одной строки
-        """
 
         query_body = f"SELECT {', '.join(fields_name)} FROM {table_name}"
         condition = f"WHERE {condition}" if condition else False
