@@ -8,13 +8,10 @@ from page_analyzer.utility_function import get_site_info
 
 load_dotenv()
 
-# сохранять данные в сессию
 app = Flask(__name__)
-
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
 DATABASE_URL = os.getenv('DATABASE_URL')
-
 db = PostgresqlOperations(DATABASE_URL)
 
 
@@ -62,7 +59,6 @@ def get_sites_list():
 
 @app.route('/urls/<site_id>', methods=['GET'])
 def show_site_info(site_id):
-
     messages = get_flashed_messages(with_categories=True)
     url_info = db.select('urls', fields_name=('id', 'name', 'DATE(created_at)'), condition=f"id = {site_id}")
     checks_list = db.select(table_name='url_checks',
@@ -79,7 +75,6 @@ def check_url(site_id):
     checks_result = get_site_info(url_site)
     if checks_result is False:
         flash('Произошла ошибка при проверке', 'error')
-        return redirect(url_for('show_site_info', site_id=site_id))  # можно удалить
     else:
         flash('Страница успешно проверена', 'success')
         db.insert("url_checks",
