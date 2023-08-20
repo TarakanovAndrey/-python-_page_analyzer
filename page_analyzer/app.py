@@ -39,14 +39,14 @@ def request_processing():
                                        condition=f"name = '{url_site}'")['answer']
 
         if not check_exists:
-            db.insert_unique("urls", name=url_site)
-            url_id = db.select('urls', fields_name=('id',), condition=f"name = '{url_site}'")[0]['id']
+            db.insert_unique(table_name="urls", name=url_site)
+            url_id = db.select(table_name='urls', fields_name=('id',), condition=f"name = '{url_site}'")[0]['id']
             flash('Страница успешно добавлена', 'success')
             return redirect(url_for('show_site_info', site_id=url_id))
 
         elif check_exists:
             flash('Страница уже существует', 'success')
-            url_id = db.select('urls', fields_name=('id',), condition=f"name = '{url_site}'")[0]['id']
+            url_id = db.select(table_name='urls', fields_name=('id',), condition=f"name = '{url_site}'")[0]['id']
             return redirect(url_for('show_site_info', site_id=url_id))
 
 
@@ -60,7 +60,7 @@ def get_sites_list():
 @app.route('/urls/<site_id>', methods=['GET'])
 def show_site_info(site_id):
     messages = get_flashed_messages(with_categories=True)
-    url_info = db.select('urls', fields_name=('id', 'name', 'DATE(created_at)'), condition=f"id = {site_id}")
+    url_info = db.select(table_name='urls', fields_name=('id', 'name', 'DATE(created_at)'), condition=f"id = {site_id}")
     checks_list = db.select(table_name='url_checks',
                             fields_name=('id', 'status_code', 'h1', 'title', 'description', 'DATE(created_at)'),
                             condition=f"url_id = {site_id}",
@@ -71,13 +71,13 @@ def show_site_info(site_id):
 
 @app.route('/urls/<site_id>/checks', methods=['POST'])
 def check_url(site_id):
-    url_site = db.select('urls', fields_name=('name',), condition=f"id = {site_id}")[0]['name']
+    url_site = db.select(table_name='urls', fields_name=('name',), condition=f"id = {site_id}")[0]['name']
     checks_result = get_site_info(url_site)
     if checks_result is False:
         flash('Произошла ошибка при проверке', 'error')
     else:
         flash('Страница успешно проверена', 'success')
-        db.insert("url_checks",
+        db.insert(table_name="url_checks",
                   url_id=site_id,
                   status_code=checks_result['status_code'],
                   h1=checks_result['h1'],

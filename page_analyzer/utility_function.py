@@ -18,19 +18,3 @@ def get_site_info(sites_url):
             return result
         case False:
             return False
-
-
-def datas_to_dict(items):
-    keys = items['column_name']
-    values = items['rows']
-    rows = list()
-    for item in values:
-        dict_ = {}
-        for key, value in zip(keys, item):
-            if value is None:
-                value = ''
-                dict_[key] = value
-            dict_[key] = value
-        rows.append(dict_)
-
-    return tuple(rows)

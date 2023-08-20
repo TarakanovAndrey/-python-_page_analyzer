@@ -1,6 +1,5 @@
 import psycopg2
-from psycopg2 import Error
-from page_analyzer.utility_function import datas_to_dict
+from psycopg2 import Error, extras
 
 
 class PostgresqlOperations:
@@ -8,8 +7,7 @@ class PostgresqlOperations:
     def __init__(self, db_url):
         self.__db_url = db_url
 
-    def insert(self, *args, **kwargs):
-        table_name = args[0]
+    def insert(self, table_name, **kwargs):
         fields_name = ', '.join(kwargs.keys())
         values = ', '.join(f"'{x}'" for x in kwargs.values())
 
@@ -23,8 +21,7 @@ class PostgresqlOperations:
             except (Exception, Error) as error:
                 print("Ошибка при работе с Postgresql", error)
 
-    def insert_unique(self, *args, **kwargs):
-        table_name = args[0]
+    def insert_unique(self, table_name, **kwargs):
         fields_name = ', '.join(kwargs.keys())
         values = ', '.join(f"'{x}'" for x in kwargs.values())
 
@@ -35,24 +32,6 @@ class PostgresqlOperations:
             try:
                 cursor = connect.cursor()
                 cursor.execute(query)
-
-            except (Exception, Error) as error:
-                print("Ошибка при работе с Postgresql", error)
-
-    def get_heads_table(self, table_name):
-        """Вывод названия всех полей таблицы"""
-        table_name = table_name
-        query = (f"SELECT column_name "
-                 f"FROM information_schema.columns "
-                 f"WHERE table_schema = 'public' "
-                 f"AND table_name = '{table_name}' ORDER BY ordinal_position ASC")
-
-        with psycopg2.connect(self.__db_url) as connect:
-            try:
-                cursor = connect.cursor()
-                cursor.execute(query)
-                rows = cursor.fetchall()
-                return rows
 
             except (Exception, Error) as error:
                 print("Ошибка при работе с Postgresql", error)
@@ -75,20 +54,14 @@ class PostgresqlOperations:
 
         with psycopg2.connect(self.__db_url) as connect:
             try:
-                cursor = connect.cursor()
+                cursor = connect.cursor(cursor_factory=psycopg2.extras.DictCursor)
                 cursor.execute(query)
                 if fetch == 'one':
                     rows = cursor.fetchone()
                 else:
                     rows = cursor.fetchall()
 
-                if fields_name == '*':
-                    column_name = tuple([x[0] for x in self.get_heads_table(table_name='urls')])
-                else:
-                    column_name = fields_name
-                out = datas_to_dict({'column_name': column_name, 'rows': rows})
-                return out
-
+                return rows
             except (Exception, Error) as error:
                 print("Ошибка при работе с Postgresql", error)
 
@@ -102,12 +75,10 @@ class PostgresqlOperations:
                     OR url_checks.created_at IS NULL ORDER BY urls.id DESC;'''
         with psycopg2.connect(self.__db_url) as connect:
             try:
-                cursor = connect.cursor()
+                cursor = connect.cursor(cursor_factory=extras.DictCursor)
                 cursor.execute(query)
                 rows = cursor.fetchall()
-                column_name = ('id', 'name', 'status_code_last_check', 'created_at_last_check')
-                out = datas_to_dict({'column_name': column_name, 'rows': rows})
-                return out
+                return rows
             except (Exception, Error) as error:
                 print("Ошибка при работе с Postgresql", error)
 
@@ -123,5 +94,15 @@ class PostgresqlOperations:
                 cursor.execute(query)
                 rows = cursor.fetchall()
                 return {'answer': rows[0][0]}
+            except (Exception, Error) as error:
+                print("Ошибка при работе с Postgresql", error)
+
+    def clear_table(self, table_name):
+        query = f"DELETE FROM {table_name};"
+        with psycopg2.connect(self.__db_url) as connect:
+            try:
+                cursor = connect.cursor()
+                cursor.execute(query)
+
             except (Exception, Error) as error:
                 print("Ошибка при работе с Postgresql", error)
