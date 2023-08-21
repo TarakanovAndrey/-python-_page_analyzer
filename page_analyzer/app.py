@@ -1,18 +1,15 @@
 import os
-from flask import Flask, render_template, request, url_for, redirect, flash, get_flashed_messages
-from urllib.parse import urlparse
 from validators import url
-from page_analyzer.database_operations import PostgresqlOperations
-from dotenv import load_dotenv
+from page_analyzer.utility_function import get_db
+from page_analyzer.utility_function import get_url
 from page_analyzer.utility_function import get_site_info
+from flask import Flask, render_template, request, url_for, redirect, flash, get_flashed_messages
 
-load_dotenv()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
-DATABASE_URL = os.getenv('DATABASE_URL')
-db = PostgresqlOperations(DATABASE_URL)
+db = get_db()
 
 
 @app.route('/')
@@ -22,14 +19,15 @@ def index():
 
 @app.route('/urls', methods=['POST'])
 def request_processing():
-    entered_request = request.form.to_dict()['url']
-    url_site = f"{urlparse(entered_request).scheme}://{urlparse(entered_request).netloc}"
-
-    if not entered_request:
+    entered_url = request.form['url']
+    if not entered_url:
         flash('URL обязателен')
         messages = get_flashed_messages()
         return render_template('index.html', messages=messages)
-    elif not url(url_site, public=True):
+
+    url_site = get_url(entered_url)
+
+    if not url(url_site, public=True):
         flash('Некорректный URL')
         messages = get_flashed_messages()
         return render_template('index.html', messages=messages), 422
