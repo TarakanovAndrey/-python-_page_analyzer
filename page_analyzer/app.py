@@ -32,54 +32,42 @@ def request_processing():
         messages = get_flashed_messages()
         return render_template('index.html', messages=messages), 422
     elif url(url_site, public=True):
-        check_exists = db.check_exists(table_name='urls',
-                                       fields_name='name',
-                                       condition=f"name = '{url_site}'")['answer']
-
-        if not check_exists:
-            db.insert_unique(table_name="urls", name=url_site)
-            url_id = db.select(table_name='urls', fields_name=('id',), condition=f"name = '{url_site}'")[0]['id']
+        check_urls_exist = db.check_urls_exist(url_site)
+        if not check_urls_exist:
+            db.urls_insert_url(url_site)
+            url_id = db.urls_get_id(url_site)
             flash('Страница успешно добавлена', 'success')
             return redirect(url_for('show_site_info', site_id=url_id))
 
-        elif check_exists:
+        elif check_urls_exist:
             flash('Страница уже существует', 'success')
-            url_id = db.select(table_name='urls', fields_name=('id',), condition=f"name = '{url_site}'")[0]['id']
+            url_id = db.urls_get_id(url_site)
             return redirect(url_for('show_site_info', site_id=url_id))
 
 
 @app.route('/urls', methods=['GET'])
 def get_sites_list():
-    sites_list = db.select_special()
-
+    sites_list = db.selecting_summary_information()
     return render_template('sites.html', sites_list=sites_list)
 
 
 @app.route('/urls/<site_id>', methods=['GET'])
 def show_site_info(site_id):
     messages = get_flashed_messages(with_categories=True)
-    url_info = db.select(table_name='urls', fields_name=('id', 'name', 'DATE(created_at)'), condition=f"id = {site_id}")
-    checks_list = db.select(table_name='url_checks',
-                            fields_name=('id', 'status_code', 'h1', 'title', 'description', 'DATE(created_at)'),
-                            condition=f"url_id = {site_id}",
-                            fields_order='id', order='DESC')
+    url_info = db.urls_get_urls_info(site_id)
+    checks_list = db.url_checks_get_checks_info(site_id)
 
     return render_template('url_info.html', url_info=url_info, checks_list=checks_list, messages=messages)
 
 
 @app.route('/urls/<site_id>/checks', methods=['POST'])
 def check_url(site_id):
-    url_site = db.select(table_name='urls', fields_name=('name',), condition=f"id = {site_id}")[0]['name']
+    url_site = db.urls_get_url(site_id)
     checks_result = get_site_info(url_site)
     if checks_result is False:
         flash('Произошла ошибка при проверке', 'error')
     else:
         flash('Страница успешно проверена', 'success')
-        db.insert(table_name="url_checks",
-                  url_id=site_id,
-                  status_code=checks_result['status_code'],
-                  h1=checks_result['h1'],
-                  title=checks_result['title'],
-                  description=checks_result['description'])
+        db.url_checks_insert_result(site_id, checks_result)
 
     return redirect(url_for('show_site_info', site_id=site_id))
