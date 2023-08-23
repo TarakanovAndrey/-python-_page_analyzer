@@ -26,20 +26,23 @@ def post_url():
         return render_template('index.html', messages=messages)
 
     url_site = collect_url(entered_url)
+    validate_url = url(url_site, public=True)
 
-    if not url(url_site, public=True):
+    if not validate_url:
         flash('Некорректный URL')
         messages = get_flashed_messages()
         return render_template('index.html', messages=messages), 422
-    elif url(url_site, public=True):
+    elif validate_url:
         check_urls_exist = db.check_urls_exist(url_site)
-        url_id = db.urls_get_id(url_site)
+
         if not check_urls_exist:
             db.urls_insert_url(url_site)
+            url_id = db.urls_get_id(url_site)
             flash('Страница успешно добавлена', 'success')
             return redirect(url_for('get_url', site_id=url_id))
 
         elif check_urls_exist:
+            url_id = db.urls_get_id(url_site)
             flash('Страница уже существует', 'success')
             return redirect(url_for('get_url', site_id=url_id))
 
