@@ -1,18 +1,6 @@
-import os
 import requests
 from bs4 import BeautifulSoup
-from dotenv import load_dotenv
 from urllib.parse import urlparse
-from page_analyzer.database_operations import PostgresqlOperations
-
-
-load_dotenv()
-
-
-def get_db():
-    database_url = os.getenv('DATABASE_URL')
-    db = PostgresqlOperations(database_url)
-    return db
 
 
 def get_site_info(sites_url):
