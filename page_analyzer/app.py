@@ -18,7 +18,7 @@ def index():
 
 
 @app.route('/urls', methods=['POST'])
-def request_processing():
+def post_url():
     entered_url = request.form['url']
     if not entered_url:
         flash('URL обязателен')
@@ -33,26 +33,25 @@ def request_processing():
         return render_template('index.html', messages=messages), 422
     elif url(url_site, public=True):
         check_urls_exist = db.check_urls_exist(url_site)
+        url_id = db.urls_get_id(url_site)
         if not check_urls_exist:
             db.urls_insert_url(url_site)
-            url_id = db.urls_get_id(url_site)
             flash('Страница успешно добавлена', 'success')
             return redirect(url_for('show_site_info', site_id=url_id))
 
         elif check_urls_exist:
             flash('Страница уже существует', 'success')
-            url_id = db.urls_get_id(url_site)
-            return redirect(url_for('show_site_info', site_id=url_id))
+            return redirect(url_for('get_url', site_id=url_id))
 
 
 @app.route('/urls', methods=['GET'])
-def get_sites_list():
+def list_urls():
     sites_list = db.selecting_summary_information()
     return render_template('sites.html', sites_list=sites_list)
 
 
 @app.route('/urls/<site_id>', methods=['GET'])
-def show_site_info(site_id):
+def get_url(site_id):
     messages = get_flashed_messages(with_categories=True)
     url_info = db.urls_get_urls_info(site_id)
     checks_list = db.url_checks_get_checks_info(site_id)
@@ -70,4 +69,14 @@ def check_url(site_id):
         flash('Страница успешно проверена', 'success')
         db.url_checks_insert_result(site_id, checks_result)
 
-    return redirect(url_for('show_site_info', site_id=site_id))
+    return redirect(url_for('get_url', site_id=site_id))
+
+
+@app.errorhandler(404)
+def not_found_error(error):
+    return render_template('404.html'), 404
+
+
+@app.errorhandler(500)
+def internal_error(error):
+    return render_template('500.html'), 500
