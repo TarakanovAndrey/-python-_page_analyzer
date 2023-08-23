@@ -1,7 +1,7 @@
 import os
 from validators import url
 from page_analyzer.utility_function import get_db
-from page_analyzer.utility_function import get_url
+from page_analyzer.utility_function import collect_url
 from page_analyzer.utility_function import get_site_info
 from flask import Flask, render_template, request, url_for, redirect, flash, get_flashed_messages
 
@@ -25,7 +25,7 @@ def post_url():
         messages = get_flashed_messages()
         return render_template('index.html', messages=messages)
 
-    url_site = get_url(entered_url)
+    url_site = collect_url(entered_url)
 
     if not url(url_site, public=True):
         flash('Некорректный URL')
@@ -37,7 +37,7 @@ def post_url():
         if not check_urls_exist:
             db.urls_insert_url(url_site)
             flash('Страница успешно добавлена', 'success')
-            return redirect(url_for('show_site_info', site_id=url_id))
+            return redirect(url_for('get_url', site_id=url_id))
 
         elif check_urls_exist:
             flash('Страница уже существует', 'success')

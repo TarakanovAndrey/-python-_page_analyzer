@@ -33,5 +33,5 @@ def get_site_info(sites_url):
             return False
 
 
-def get_url(url):
+def collect_url(url):
     return f"{urlparse(url).scheme}://{urlparse(url).netloc}"
