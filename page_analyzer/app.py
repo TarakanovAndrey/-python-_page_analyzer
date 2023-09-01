@@ -53,9 +53,9 @@ def post_url():
 def list_urls():
     urls_info = get_urls_info()
     checks_info = get_checks_info()
-    union_info = union_datas(urls_info, checks_info)
+    union_url_info = union_datas(urls_info, checks_info)
 
-    return render_template('sites.html', sites_list=union_info)
+    return render_template('sites.html', sites_list=union_url_info)
 
 
 @app.route('/urls/<site_id>', methods=['GET'])

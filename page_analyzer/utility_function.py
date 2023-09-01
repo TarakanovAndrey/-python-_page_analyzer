@@ -36,6 +36,7 @@ def union_datas(data1, data2):
                 result[-1]['name'] = value1['name']
                 result[-1]['status_code'] = value2['status_code']
                 result[-1]['data'] = value2['max']
+                break
         if not result[-1]:
             result[-1]['id'] = value1['id']
             result[-1]['name'] = value1['name']
