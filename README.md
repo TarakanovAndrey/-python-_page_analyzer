@@ -3,7 +3,7 @@
 
 [![Maintainability](https://api.codeclimate.com/v1/badges/a28db54619c30d5d352d/maintainability)](https://codeclimate.com/github/TarakanovAndrey/python-project-83/maintainability)  
 
-[![Test Coverage](https://api.codeclimate.com/v1/badges/a28db54619c30d5d352d/test_coverage)](https://codeclimate.com/github/TarakanovAndrey/python-project-83/test_coverage)  
+[![Check Lint](https://api.codeclimate.com/v1/badges/a28db54619c30d5d352d/test_coverage)](https://codeclimate.com/github/TarakanovAndrey/python-project-83/test_coverage)  
 
 
 ## С функционалом приложения можно ознакомиться по ссылке ниже:  
