@@ -23,3 +23,22 @@ def get_site_info(sites_url):
 
 def collect_url(url):
     return f"{urlparse(url).scheme}://{urlparse(url).netloc}"
+
+
+def union_datas(data1, data2):
+    result = list()
+
+    for value1 in data1:
+        result.append(dict())
+        for value2 in data2:
+            if value1['id'] == value2['url_id']:
+                result[-1]['id'] = value1['id']
+                result[-1]['name'] = value1['name']
+                result[-1]['status_code'] = value2['status_code']
+                result[-1]['data'] = value2['max']
+        if not result[-1]:
+            result[-1]['id'] = value1['id']
+            result[-1]['name'] = value1['name']
+            result[-1]['status_code'] = ' '
+            result[-1]['data'] = ' '
+    return result

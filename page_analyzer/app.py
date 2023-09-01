@@ -1,15 +1,15 @@
 import os
 from validators import url
-from page_analyzer.utility_function import collect_url
-from page_analyzer.utility_function import get_site_info
+from page_analyzer.utility_function import collect_url, get_site_info, union_datas
 from flask import Flask, render_template, request, url_for, redirect, flash, get_flashed_messages
 from page_analyzer.database_operations import (insert_checks_result,
                                                insert_url, get_id,
-                                               get_urls_info,
+                                               get_url_info,
                                                get_sites_url,
-                                               get_checks_info,
-                                               selecting_summary_information,
-                                               check_urls_exist)
+                                               get_checks_info_of_url,
+                                               check_urls_exist,
+                                               get_urls_info,
+                                               get_checks_info)
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
@@ -51,17 +51,23 @@ def post_url():
 
 @app.route('/urls', methods=['GET'])
 def list_urls():
-    sites_list = selecting_summary_information()
-    return render_template('sites.html', sites_list=sites_list)
+    urls_info = get_urls_info()
+    checks_info = get_checks_info()
+    union_info = union_datas(urls_info, checks_info)
+
+    return render_template('sites.html', sites_list=union_info)
 
 
 @app.route('/urls/<site_id>', methods=['GET'])
 def get_url(site_id):
     messages = get_flashed_messages(with_categories=True)
-    url_info = get_urls_info(site_id)
-    checks_list = get_checks_info(site_id)
+    url_info = get_url_info(site_id)
+    checks_list = get_checks_info_of_url(site_id)
 
-    return render_template('url_info.html', url_info=url_info, checks_list=checks_list, messages=messages)
+    return render_template('url_info.html',
+                           url_info=url_info,
+                           checks_list=checks_list,
+                           messages=messages)
 
 
 @app.route('/urls/<site_id>/checks', methods=['POST'])

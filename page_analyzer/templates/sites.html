@@ -18,27 +18,17 @@
     </thead>
     <tbody>
       {% for row in sites_list %}
-
-      <tr>
+        <tr>
 
         <td>{{ row['id'] }}</td>
-
         <td><a href="/urls/{{ row['id'] }}">{{ row['name'] }}</a></td>
-
-        {% if row['date'] %}
-        <td>{{ row['date'] }}</td>
-        {% else %}
-        <td></td>
-        {% endif %}
-
-        {% if row['date'] %}
+        <td>{{ row['data'] }}</td>
         <td>{{ row['status_code'] }}</td>
-        {% else %}
-        <td></td>
-        {% endif %}
 
       </tr>
+
       {% endfor %}
+
 
     </tbody>
   </table>

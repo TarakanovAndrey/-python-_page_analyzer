@@ -54,7 +54,7 @@ def get_id(url):
             print("Ошибка при работе с Postgresql", error)
 
 
-def get_urls_info(id_note):
+def get_url_info(id_note):
 
     query = f"SELECT id, name, DATE(created_at) FROM urls WHERE id='{id_note}'"
 
@@ -80,7 +80,7 @@ def get_sites_url(id_note):
             print("Ошибка при работе с Postgresql", error)
 
 
-def get_checks_info(id_note):
+def get_checks_info_of_url(id_note):
 
     query = f'''SELECT id, status_code, h1, title, description, DATE(created_at)
             FROM url_checks
@@ -96,24 +96,6 @@ def get_checks_info(id_note):
             print("Ошибка при работе с Postgresql", error)
 
 
-def selecting_summary_information():
-    query = '''SELECT urls.id, urls.name, url_checks.status_code, DATE(url_checks.created_at)
-                FROM urls
-                LEFT OUTER JOIN url_checks
-                ON urls.id = url_checks.url_id
-                WHERE url_checks.created_at = (SELECT MAX(created_at)
-                FROM url_checks WHERE urls.id = url_checks.url_id)
-                OR url_checks.created_at IS NULL ORDER BY urls.id DESC;'''
-    with psycopg2.connect(db) as connect:
-        try:
-            cursor = connect.cursor(cursor_factory=extras.DictCursor)
-            cursor.execute(query)
-            rows = cursor.fetchall()
-            return rows
-        except (Exception, Error) as error:
-            print("Ошибка при работе с Postgresql", error)
-
-
 def check_urls_exist(url: str):
 
     query = f"SELECT EXISTS (SELECT name FROM urls WHERE name='{url}');"
@@ -124,5 +106,32 @@ def check_urls_exist(url: str):
             cursor.execute(query)
             rows = cursor.fetchone()
             return rows[0]
+        except (Exception, Error) as error:
+            print("Ошибка при работе с Postgresql", error)
+
+
+def get_urls_info():
+    query = "SELECT id, name FROM urls ORDER BY id DESC"
+    with psycopg2.connect(db) as connect:
+        try:
+            cursor = connect.cursor(cursor_factory=extras.DictCursor)
+            cursor.execute(query)
+            rows = cursor.fetchall()
+            return rows
+        except (Exception, Error) as error:
+            print("Ошибка при работе с Postgresql", error)
+
+
+def get_checks_info():
+    query = '''SELECT url_id, status_code, MAX(DATE(created_at))
+               FROM url_checks GROUP BY url_id, status_code
+               ORDER BY url_id DESC;'''
+
+    with psycopg2.connect(db) as connect:
+        try:
+            cursor = connect.cursor(cursor_factory=extras.DictCursor)
+            cursor.execute(query)
+            rows = cursor.fetchall()
+            return rows
         except (Exception, Error) as error:
             print("Ошибка при работе с Postgresql", error)
