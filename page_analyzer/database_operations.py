@@ -9,7 +9,7 @@ load_dotenv()
 db = os.getenv('DATABASE_URL')
 
 
-def url_checks_insert_result(id_, checks_result):
+def insert_checks_result(id_, checks_result):
     status_code = checks_result['status_code']
     h1 = checks_result['h1']
     title = checks_result['title']
@@ -27,7 +27,7 @@ def url_checks_insert_result(id_, checks_result):
             print("Ошибка при работе с Postgresql", error)
 
 
-def urls_insert_url(url):
+def insert_url(url):
 
     query = f"INSERT INTO urls (name) VALUES ('{url}') ON CONFLICT (name) DO NOTHING RETURNING id;"
 
@@ -41,7 +41,7 @@ def urls_insert_url(url):
             print("Ошибка при работе с Postgresql", error)
 
 
-def urls_get_id(url):
+def get_id(url):
 
     query = f"SELECT id FROM urls WHERE name='{url}'"
 
@@ -54,7 +54,7 @@ def urls_get_id(url):
             print("Ошибка при работе с Postgresql", error)
 
 
-def urls_get_urls_info(id_note):
+def get_urls_info(id_note):
 
     query = f"SELECT id, name, DATE(created_at) FROM urls WHERE id='{id_note}'"
 
@@ -67,7 +67,7 @@ def urls_get_urls_info(id_note):
             print("Ошибка при работе с Postgresql", error)
 
 
-def urls_get_url(id_note):
+def get_url(id_note):
 
     query = f"SELECT name FROM urls WHERE id='{id_note}'"
 
@@ -80,7 +80,7 @@ def urls_get_url(id_note):
             print("Ошибка при работе с Postgresql", error)
 
 
-def url_checks_get_checks_info(id_note):
+def get_checks_info(id_note):
 
     query = f'''SELECT id, status_code, h1, title, description, DATE(created_at)
             FROM url_checks

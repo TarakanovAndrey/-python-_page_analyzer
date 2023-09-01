@@ -3,11 +3,11 @@ from validators import url
 from page_analyzer.utility_function import collect_url
 from page_analyzer.utility_function import get_site_info
 from flask import Flask, render_template, request, url_for, redirect, flash, get_flashed_messages
-from page_analyzer.database_operations import (url_checks_insert_result,
-                                               urls_insert_url, urls_get_id,
-                                               urls_get_urls_info,
-                                               urls_get_url,
-                                               url_checks_get_checks_info,
+from page_analyzer.database_operations import (insert_checks_result,
+                                               insert_url, get_id,
+                                               get_urls_info,
+                                               get_url,
+                                               get_checks_info,
                                                selecting_summary_information,
                                                check_urls_exist)
 
@@ -39,12 +39,12 @@ def post_url():
     check_exist = check_urls_exist(url_site)
 
     if not check_exist:
-        url_id = urls_insert_url(url_site)
+        url_id = insert_url(url_site)
         flash('Страница успешно добавлена', 'success')
         return redirect(url_for('get_url', site_id=url_id))
 
     elif check_exist:
-        url_id = urls_get_id(url_site)
+        url_id = get_id(url_site)
         flash('Страница уже существует', 'success')
         return redirect(url_for('get_url', site_id=url_id))
 
@@ -58,21 +58,21 @@ def list_urls():
 @app.route('/urls/<site_id>', methods=['GET'])
 def get_url(site_id):
     messages = get_flashed_messages(with_categories=True)
-    url_info = urls_get_urls_info(site_id)
-    checks_list = url_checks_get_checks_info(site_id)
+    url_info = get_urls_info(site_id)
+    checks_list = get_checks_info(site_id)
 
     return render_template('url_info.html', url_info=url_info, checks_list=checks_list, messages=messages)
 
 
 @app.route('/urls/<site_id>/checks', methods=['POST'])
 def check_url(site_id):
-    url_site = urls_get_url(site_id)
+    url_site = get_url(site_id)
     checks_result = get_site_info(url_site)
     if checks_result is False:
         flash('Произошла ошибка при проверке', 'error')
     else:
         flash('Страница успешно проверена', 'success')
-        url_checks_insert_result(site_id, checks_result)
+        insert_checks_result(site_id, checks_result)
 
     return redirect(url_for('get_url', site_id=site_id))
 
