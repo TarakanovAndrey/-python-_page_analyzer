@@ -30,38 +30,23 @@ def post_url():
 
     url_site = collect_url(entered_url)
     validate_url = url(url_site, public=True)
+
+    if not validate_url:
+        flash('Некорректный URL')
+        messages = get_flashed_messages()
+        return render_template('index.html', messages=messages), 422
+
     check_exist = check_urls_exist(url_site)
 
-    # if not validate_url:
-    #     flash('Некорректный URL')
-    #     messages = get_flashed_messages()
-    #     return render_template('index.html', messages=messages), 422
-    #
-    # check_exist = check_urls_exist(url_site)
-    #
-    # if validate_url and not check_exist:
-    #
-    #     url_id = urls_insert_url(url_site)
-    #     flash('Страница успешно добавлена', 'success')
-    #     return redirect(url_for('get_url', site_id=url_id))
-    #
-    # elif validate_url and check_exist:
-    #     url_id = urls_get_id(url_site)
-    #     flash('Страница уже существует', 'success')
-    #     return redirect(url_for('get_url', site_id=url_id))
-    match validate_url, check_exist:
-        case False, False:
-            flash('Некорректный URL')
-            messages = get_flashed_messages()
-            return render_template('index.html', messages=messages), 422
-        case True, False:
-            url_id = urls_insert_url(url_site)
-            flash('Страница успешно добавлена', 'success')
-            return redirect(url_for('get_url', site_id=url_id))
-        case True, True:
-            url_id = urls_get_id(url_site)
-            flash('Страница уже существует', 'success')
-            return redirect(url_for('get_url', site_id=url_id))
+    if validate_url and not check_exist:
+        url_id = urls_insert_url(url_site)
+        flash('Страница успешно добавлена', 'success')
+        return redirect(url_for('get_url', site_id=url_id))
+
+    elif validate_url and check_exist:
+        url_id = urls_get_id(url_site)
+        flash('Страница уже существует', 'success')
+        return redirect(url_for('get_url', site_id=url_id))
 
 
 @app.route('/urls', methods=['GET'])
