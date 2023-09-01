@@ -5,7 +5,7 @@
 
 [//]: # ([![Actions Status]&#40;https://github.com/TarakanovAndrey/python-project-83/workflows/tarakanov-check/badge.svg&#41;]&#40;https://github.com/TarakanovAndrey/python-project-83/actions&#41;  )
 
-[![Actions Status](https://github.com/TarakanovAndrey/python-project-83/workflows/hexlet-check/badge.svg)](https://github.com/TarakanovAndrey/python-project-83/actions)  
+[![Actions Status](https://github.com/TarakanovAndrey/python-project-83/workflows/tarakanov-check/badge.svg)](https://github.com/TarakanovAndrey/python-project-83/actions)  
 
 ## С функционалом приложения можно ознакомиться по ссылке ниже:  
 

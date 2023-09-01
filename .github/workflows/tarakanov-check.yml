@@ -1,4 +1,4 @@
-name: Python CI
+name: tarakanov-check
 
 on:
   - push
