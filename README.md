@@ -3,8 +3,9 @@
 
 [![Maintainability](https://api.codeclimate.com/v1/badges/a28db54619c30d5d352d/maintainability)](https://codeclimate.com/github/TarakanovAndrey/python-project-83/maintainability)  
 
-[![Actions Status](https://github.com/TarakanovAndrey/python-project-83/workflows/tarakanov-check/badge.svg)](https://github.com/TarakanovAndrey/python-project-83/actions)  
+[//]: # ([![Actions Status]&#40;https://github.com/TarakanovAndrey/python-project-83/workflows/tarakanov-check/badge.svg&#41;]&#40;https://github.com/TarakanovAndrey/python-project-83/actions&#41;  )
 
+[![Actions Status](https://github.com/TarakanovAndrey/python-project-83/workflows/hexlet-check/badge.svg)](https://github.com/TarakanovAndrey/python-project-83/actions)  
 
 ## С функционалом приложения можно ознакомиться по ссылке ниже:  
 
