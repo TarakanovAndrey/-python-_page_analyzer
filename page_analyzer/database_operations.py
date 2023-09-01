@@ -67,7 +67,7 @@ def get_urls_info(id_note):
             print("Ошибка при работе с Postgresql", error)
 
 
-def get_url(id_note):
+def get_sites_url(id_note):
 
     query = f"SELECT name FROM urls WHERE id='{id_note}'"
 

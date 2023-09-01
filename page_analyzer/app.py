@@ -6,7 +6,7 @@ from flask import Flask, render_template, request, url_for, redirect, flash, get
 from page_analyzer.database_operations import (insert_checks_result,
                                                insert_url, get_id,
                                                get_urls_info,
-                                               get_url,
+                                               get_sites_url,
                                                get_checks_info,
                                                selecting_summary_information,
                                                check_urls_exist)
@@ -66,7 +66,7 @@ def get_url(site_id):
 
 @app.route('/urls/<site_id>/checks', methods=['POST'])
 def check_url(site_id):
-    url_site = get_url(site_id)
+    url_site = get_sites_url(site_id)
     checks_result = get_site_info(url_site)
     if checks_result is False:
         flash('Произошла ошибка при проверке', 'error')
