@@ -35,18 +35,19 @@ def post_url():
         flash('Некорректный URL')
         messages = get_flashed_messages()
         return render_template('index.html', messages=messages), 422
-    elif validate_url:
-        check_exist = check_urls_exist(url_site)
 
-        if not check_exist:
-            url_id = urls_insert_url(url_site)
-            flash('Страница успешно добавлена', 'success')
-            return redirect(url_for('get_url', site_id=url_id))
+    check_exist = check_urls_exist(url_site)
 
-        elif check_exist:
-            url_id = urls_get_id(url_site)
-            flash('Страница уже существует', 'success')
-            return redirect(url_for('get_url', site_id=url_id))
+    if validate_url and not check_exist:
+
+        url_id = urls_insert_url(url_site)
+        flash('Страница успешно добавлена', 'success')
+        return redirect(url_for('get_url', site_id=url_id))
+
+    elif validate_url and check_exist:
+        url_id = urls_get_id(url_site)
+        flash('Страница уже существует', 'success')
+        return redirect(url_for('get_url', site_id=url_id))
 
 
 @app.route('/urls', methods=['GET'])
